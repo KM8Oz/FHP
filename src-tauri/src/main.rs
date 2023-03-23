@@ -4,6 +4,7 @@ use tauri::{Manager, PhysicalPosition, SystemTrayEvent, Window};
 use tauri::{PhysicalSize, SystemTray};
 use tauri_plugin_oauth::{start_with_config, OauthConfig};
 mod mylib;
+mod getuidwin;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String>{
