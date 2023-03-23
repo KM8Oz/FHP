@@ -1,8 +1,7 @@
 use std::env;
 use std::{collections::HashSet, path::PathBuf};
-use sysinfo::{ProcessExt, System, SystemExt};
+use sysinfo::{ProcessExt, System, SystemExt, UserExt};
 
-use crate::getuidwin;
 
 #[derive(Clone, Debug, serde::Serialize)]
 pub struct ItemJson {
@@ -15,13 +14,7 @@ pub fn user_processes() -> Result<Vec<ItemJson>, String> {
     system.refresh_all();
     // let current_uid = unsafe { libc::getuid() }; // get the user ID of the current user
                                                  // let apps_dir = dirs::home_dir().expect("Could not determine applications directory.");
-    let current_uid = if cfg!(unix) {
-        // Unix-like system (Linux, macOS, etc.)
-        unsafe { libc::getuid().to_string() }
-    } else {
-        // Windows
-        unsafe { getuidwin::get_current_user_uid().unwrap() }
-    };
+    let current_uid = whoami::username();
     let apps_dir = match env::consts::OS {
         "macos" => match dirs::home_dir() {
             Some(home) => vec![home.join("Applications"), PathBuf::from("/Applications")],
@@ -45,8 +38,15 @@ pub fn user_processes() -> Result<Vec<ItemJson>, String> {
     let mut user_processes = processes
         .into_iter()
         .filter(|(_, process)| {
-            process.user_id().is_some()
-                && process.user_id().unwrap().to_string() == current_uid.to_string()
+
+                let user = if let Some(uid) = process.user_id() {
+                    system.get_user_by_id(uid)
+                } else {
+                    None
+                };
+                process.user_id().is_some()
+                && user.is_some()
+                && user.unwrap().name() == current_uid.to_string()
                 && apps_dir
                     .iter()
                     .find(|s| process.exe().starts_with(s.as_os_str()))
