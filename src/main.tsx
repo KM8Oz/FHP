@@ -28,7 +28,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
       webRedirectUrl={import.meta.env.VITE_POCKET_BASE_REDIRECT_URL ? import.meta.env.VITE_POCKET_BASE_REDIRECT_URL : VITE_POCKET_BASE_REDIRECT_URL}
       openURL={async (url: string | URL | undefined) => {
         // for example expo WebBrowser
-        console.log({ url });
         if (url && !String(url)?.includes("undefined")) {
           await open(String(url));
         } else {
