@@ -2,6 +2,8 @@ use std::env;
 use std::{collections::HashSet, path::PathBuf};
 use sysinfo::{ProcessExt, System, SystemExt};
 
+use crate::getuidwin;
+
 #[derive(Clone, Debug, serde::Serialize)]
 pub struct ItemJson {
     name: String,
@@ -11,9 +13,15 @@ pub struct ItemJson {
 pub fn user_processes() -> Result<Vec<ItemJson>, String> {
     let mut system = System::new_all();
     system.refresh_all();
-
-    let current_uid = unsafe { libc::getuid() }; // get the user ID of the current user
+    // let current_uid = unsafe { libc::getuid() }; // get the user ID of the current user
                                                  // let apps_dir = dirs::home_dir().expect("Could not determine applications directory.");
+    let current_uid = if cfg!(unix) {
+        // Unix-like system (Linux, macOS, etc.)
+        unsafe { libc::getuid().to_string() }
+    } else {
+        // Windows
+        unsafe { getuidwin::get_current_user_uid().unwrap() }
+    };
     let apps_dir = match env::consts::OS {
         "macos" => match dirs::home_dir() {
             Some(home) => vec![home.join("Applications"), PathBuf::from("/Applications")],
@@ -49,11 +57,12 @@ pub fn user_processes() -> Result<Vec<ItemJson>, String> {
         })
         .collect::<Vec<_>>();
     user_processes.sort_by_key(|(_, process)| process.name().to_lowercase());
-    let results_processes = user_processes.iter().map(|(_, process)|{
-        ItemJson {
+    let results_processes = user_processes
+        .iter()
+        .map(|(_, process)| ItemJson {
             name: process.name().to_string(),
-            uptime: process.start_time() as u32
-        }
-    }).collect::<Vec<_>>();
+            uptime: process.start_time() as u32,
+        })
+        .collect::<Vec<_>>();
     Ok(results_processes)
 }
