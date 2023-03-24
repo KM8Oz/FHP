@@ -18,7 +18,7 @@ export function Home() {
                 left:0,
                 top:position
             })
-        }, 3000)
+        }, 5000)
     }, [stats])
     const RoundedBorderList = ({ items }:{ items: {name:string, uptime: number }[]}) => {
         return (

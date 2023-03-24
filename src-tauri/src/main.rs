@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::{Manager, PhysicalPosition, SystemTrayEvent, Window};
 use tauri::{PhysicalSize, SystemTray};
-use tauri_plugin_oauth::{start_with_config, OauthConfig};
 mod mylib;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -18,32 +17,18 @@ struct Payload {
   uri: String,
 }
 #[tauri::command]
-async fn start_server(window: Window) -> Result<u16, String>{
-    // start(move |url| {
-    //     println!("Redirect_uri server ({}) already started✅",url);
-    //     // Because of the unprotected localhost port, you must verify the URL here.
-    //     // Preferebly send back only the token, or nothing at all if you can handle everything else in Rust.
-    //     let _ = window.emit("redirect_uri", url);
-    // })
-    // .map_err(|err| {
-    //     println!("Redirect_uri server err : ({})",err.to_string());
-    //     err.to_string()
-    // })
-    // let app = App::new(
-    //     _app.app_handle().package_info().version.build.to_string(),
-    //     _app.app_handle().package_info().package_name(),
-    //     "FHP".into(),
-    //     "FHP".into(),
-    //     None,
-    // );
-    // let _ = thisinstall(&app, &vec!["fhp://*".into()]);
-    let serverconfig = OauthConfig {
-        ports: Some(vec![62235 as u16]),
-        ..OauthConfig::default()
-    };
-    start_with_config(serverconfig, move |uri| {
-        window.emit_all("event-uri", Payload { uri }).unwrap();
-    }).map_err(|err| err.to_string())
+async fn start_server() -> Result<Payload, String>{
+    let request_uri = mylib::start_server(62235 as u16).await;
+    match request_uri {
+        Ok(url)=>{
+            let _uri = format!("http://localhost:62235{}", url);
+            Ok(Payload { uri:_uri })
+        },
+        Err(_err)=>{
+           Err(_err.to_string())
+        }
+    }
+   
 }
 
 fn main() {

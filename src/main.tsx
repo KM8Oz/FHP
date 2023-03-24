@@ -7,25 +7,12 @@ import { Pocketbase } from "pocketbase-react";
 import toast, { Toaster } from "react-hot-toast";
 import { open } from '@tauri-apps/api/shell';
 import { VITE_POCKET_BASE_REDIRECT_URL, VITE_POCKET_BASE_URL } from "./utils";
-// #import.meta.env
-// BASE_URL: "/"
-// DEV: true
-// MODE: "development"
-// PROD: false
-// SSR: false
-// TAURI_ARCH: "x86_64"
-// TAURI_DEBUG: "true"
-// TAURI_FAMILY: "unix"
-// TAURI_PLATFORM: "macos"
-// TAURI_PLATFORM_TYPE: "Darwin"
-// TAURI_PLATFORM_VERSION: "12.4.0"
-// TAURI_TARGET_TRIPLE: "x86_64-apple-darwin"
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <Pocketbase
-      serverURL={import.meta.env.VITE_POCKET_BASE_URL ? import.meta.env.VITE_POCKET_BASE_URL : VITE_POCKET_BASE_URL}
-      initialCollections={[]}
-      webRedirectUrl={import.meta.env.VITE_POCKET_BASE_REDIRECT_URL ? import.meta.env.VITE_POCKET_BASE_REDIRECT_URL : VITE_POCKET_BASE_REDIRECT_URL}
+      serverURL={VITE_POCKET_BASE_URL}
+      initialCollections={["users"]}
+      webRedirectUrl={VITE_POCKET_BASE_REDIRECT_URL}
       openURL={async (url: string | URL | undefined) => {
         // for example expo WebBrowser
         if (url && !String(url)?.includes("undefined")) {

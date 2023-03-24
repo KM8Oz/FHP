@@ -1,7 +1,8 @@
 use std::env;
 use std::{collections::HashSet, path::PathBuf};
 use sysinfo::{ProcessExt, System, SystemExt, UserExt};
-
+use std::io::prelude::*;
+use std::net::TcpListener;
 
 #[derive(Clone, Debug, serde::Serialize)]
 pub struct ItemJson {
@@ -65,4 +66,32 @@ pub fn user_processes() -> Result<Vec<ItemJson>, String> {
         })
         .collect::<Vec<_>>();
     Ok(results_processes)
+}
+
+pub async fn start_server(port: u16) -> std::io::Result<String> {
+    let listener = TcpListener::bind(format!("127.0.0.1:{}", port))?;
+    let mut incoming = listener.incoming();
+
+    while let Some(stream) = incoming.next() {
+        let mut stream = stream?;
+        let mut buf = [0; 1024];
+        stream.read(&mut buf)?;
+
+        let request_str = String::from_utf8_lossy(&buf[..]);
+        let request_line = request_str.lines().next().unwrap();
+
+        let request_url = request_line.split_whitespace().nth(1).unwrap().to_string();
+
+        // Send a response back to the client
+        let response_str = format!("HTTP/1.1 200 OK\r\n\r\nReceived request for {}", request_url);
+        stream.write(response_str.as_bytes())?;
+        stream.flush()?;
+
+        return Ok(request_url);
+    }
+
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Other,
+        "No request was received",
+    ))
 }
