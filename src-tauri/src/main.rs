@@ -5,7 +5,7 @@ use tauri::{PhysicalSize, SystemTray};
 mod mylib;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String>{
+async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String> {
     mylib::user_processes()
 }
 #[tauri::command]
@@ -14,21 +14,18 @@ fn greet(name: &str) -> String {
 }
 #[derive(Clone, serde::Serialize)]
 struct Payload {
-  uri: String,
+    uri: String,
 }
 #[tauri::command]
-async fn start_server() -> Result<Payload, String>{
+async fn start_server() -> Result<Payload, String> {
     let request_uri = mylib::start_server(62235 as u16).await;
     match request_uri {
-        Ok(url)=>{
+        Ok(url) => {
             let _uri = format!("http://localhost:62235{}", url);
-            Ok(Payload { uri:_uri })
-        },
-        Err(_err)=>{
-           Err(_err.to_string())
+            Ok(Payload { uri: _uri })
         }
+        Err(_err) => Err(_err.to_string()),
     }
-   
 }
 
 fn main() {
@@ -79,7 +76,7 @@ fn main() {
                             PhysicalPosition {
                                 x: ((position.x as u32) - (600 * monitorsize.width / 3360) / 2)
                                     + 32,
-                                y: ((position.y as u32) + (900 * monitorsize.height / 2100)),
+                                y: (position.y as u32 - 600),
                             }
                         } else {
                             PhysicalPosition {
@@ -124,7 +121,11 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet, start_server, user_processes])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            start_server,
+            user_processes
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
