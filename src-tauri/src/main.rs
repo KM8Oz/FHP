@@ -3,6 +3,9 @@
 use tauri::{Manager, PhysicalPosition, SystemTrayEvent, Window};
 use tauri::{PhysicalSize, SystemTray};
 mod mylib;
+use window_shadows::set_shadow;
+
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String> {
@@ -44,7 +47,8 @@ fn main() {
                     width: 600 * monitorsize.width / 3360,
                     height: 900 * monitorsize.height / 2100,
                 });
-                let _ = _main_window.set_position(PhysicalPosition { x: -1000, y: -1000 });
+                set_shadow(&_main_window, true).expect("Unsupported platform!");;
+                // let _ = _main_window.set_position(PhysicalPosition { x: -1000, y: -1000 });
             }
             // let _ = start_server(app.get_window("main").unwrap());
             Ok(())
