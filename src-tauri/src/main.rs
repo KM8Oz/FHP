@@ -11,10 +11,7 @@ use window_shadows::set_shadow;
 async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String> {
     mylib::user_processes()
 }
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     uri: String,
@@ -105,6 +102,7 @@ fn main() {
                         }
                     };
                     let _ = main_window.set_position(winposition);
+                    let _ = main_window.set_always_on_top(true);
                     match main_window.is_visible() {
                         Ok(status) => {
                             if status {
@@ -126,7 +124,6 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
             start_server,
             user_processes
         ])

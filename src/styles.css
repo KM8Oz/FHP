@@ -17,6 +17,11 @@
 .scaleeffect{
   transform: scale(1);
   transition: transform ease-in-out 100ms;
+  cursor: pointer;
+  user-select: none;
+}
+.scaleeffect>* {
+  user-select: none;
 }
 .scaleeffect:active{
   transform: scale(.97);

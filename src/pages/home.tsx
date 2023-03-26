@@ -28,7 +28,7 @@ export function Home() {
     return (
       <ListWrapper >
         {items.map(item => (
-          <ItemContainer key={item.name}>
+          <ItemContainer className="scaleeffect" key={item.name}>
             <ItemName>{item.name}</ItemName>
             <ItemTime>{new Date(item.uptime).toLocaleString('en', {
               timeStyle: "short",
@@ -101,6 +101,7 @@ const ItemContainer = styled.div`
   border: 1px solid #ffffff;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
+  user-select: none;
 `;
 
 const ItemName = styled.div`
@@ -108,6 +109,7 @@ const ItemName = styled.div`
   font-weight: 500;
   color: #333;
   flex: 1;
+  user-select: none;
 `;
 
 const ItemTime = styled.div`
@@ -115,6 +117,7 @@ const ItemTime = styled.div`
   text-align: end;
   font-weight: 400;
   color: #666;
+  user-select: none;
   flex: 1;
 `;
 const ListWrapper = styled.div`
