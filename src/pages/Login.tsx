@@ -152,7 +152,7 @@ export function LoginSignup(props: any) {
 
         const submit = () => {
             if (logindata.username.value && logindata.password.value) {
-                if (logindata.username.isvalid && logindata.password.isvalid) {
+                // if (logindata.username.isvalid && logindata.password.isvalid) {
                     let loading_d = toast.loading(`Login using credentials!`,
                         {
                             duration: Infinity,
@@ -200,22 +200,22 @@ export function LoginSignup(props: any) {
                             }
                         );
                     })
-                } else {
-                    toast.dismiss('bad_credentials')
-                    toast.error(`Please check <${!logindata.username.isvalid && 'username'},${!logindata.username.isvalid && 'password'} >!`,
-                        {
-                            id: 'bad_credentials',
-                            duration: 700,
-                            style: {
-                                borderRadius: '10px',
-                                background: '#333',
-                                color: '#fff',
-                                padding: '4px 5px',
-                                fontSize: '10px',
-                            },
-                        }
-                    );
-                }
+                // } else {
+                //     toast.dismiss('bad_credentials')
+                //     toast.error(`Please check <${!logindata.username.isvalid && 'username'},${!logindata.username.isvalid && 'password'} >!`,
+                //         {
+                //             id: 'bad_credentials',
+                //             duration: 700,
+                //             style: {
+                //                 borderRadius: '10px',
+                //                 background: '#333',
+                //                 color: '#fff',
+                //                 padding: '4px 5px',
+                //                 fontSize: '10px',
+                //             },
+                //         }
+                //     );
+                // }
             } else {
                 toast.dismiss('bad_credentials')
                 toast.error(`Please fill <${!logindata.username.value && 'username'},${!logindata.username.value && 'password'} >!`,
