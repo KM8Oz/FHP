@@ -3,6 +3,7 @@ import { y } from "@tauri-apps/api/path-e12e0e34";
 import { useAuth } from "pocketbase-react"
 import React, { useEffect, useRef, useState } from "react"
 import { useNavigate, useNavigation } from "react-router-dom";
+import { PuffLoader } from "react-spinners";
 import styled from "styled-components";
 import { COLORS, FONTS } from "../utils"
 
@@ -61,7 +62,9 @@ export function Home() {
           </p>
         )
       }
-      <RoundedBorderList items={stats} />
+      {stats.length > 0 ? 
+      <ErrorWrapper><PuffLoader color="#929292" title="Error!" /></ErrorWrapper> : 
+      <RoundedBorderList items={stats} />}
       <ButtonsFooter >
         <button
           onClick={() => actions.signOut()}
@@ -134,4 +137,10 @@ const ButtonsFooter = styled.div`
   align-items: center;
   width: 100%;
   flex: 1;
+`;
+const ErrorWrapper = styled.div`
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
