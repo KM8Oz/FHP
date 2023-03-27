@@ -13,22 +13,18 @@ edition = "2021"
 tauri-build = { version = "1.2", features = [] }
 
 [dependencies]
-tauri = { version = "1.2", features = [
-    "macos-private-api",
-    "shell-open",
-    "system-tray",
-    "window-hide",
-    "window-show",
-] }
+tauri = { version = "1.2", features = ["macos-private-api", "shell-open", "system-tray", "window-hide", "window-show"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-libc = { version = "0.2.140" }
+# libc = { version = "0.2.140" }
 sysinfo = { version = "0.28.3" }
 dirs = { version = "5.0.0" }
 # winapi = { version = "0.3.9", features = ["winuser", "winbase", "processthreadsapi", "securitybaseapi", "winnt"] }
 whoami = "1.4.0"
+window-shadows = { git = "https://github.com/tauri-apps/window-shadows.git" }
+# futures = "*"
 # system_uri = { version = "0.3.0", default-features = false }
-tauri-plugin-oauth = { git = "https://github.com/FabianLars/tauri-plugin-oauth.git" }
+# tauri-plugin-oauth = { git = "https://github.com/FabianLars/tauri-plugin-oauth.git" }
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!

@@ -12,68 +12,46 @@ import { appWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api";
 export function LoginSignup(props: any) {
     const { isSignedIn, user, actions } = useAuth();
+    const [unlisten, setMunlisten] = useState<any>(null);
     // const [methods, setMethods] = useState({} as {
     //     usernamePassword: boolean;
     //     emailPassword: boolean;
     //     authProviders: Array<AuthProviderInfo>;
     // } | undefined);
     const [tab, setTab] = useState(0)
-    useEffect(() => {
-        var unlisten: any;
-        (async () => {
-            try {
-                let _ = await invoke<number | string>("start_server");
-            } catch (start_server) {
-                // console.log({ start_server });
-            }
-            unlisten = await appWindow.listen<any>('event-uri', async ({ event, payload }) => {
-                const code = () => {
-                    try {
-                        let _url = payload?.uri ? new URL(payload.uri) : { searchParams: null };
-                        if (_url?.searchParams?.get('code')) {
-                            return payload?.uri;
-                        } else {
-                            return undefined
-                        }
-                    } catch (err) {
+    const startlistner = async () => {
+        invoke<any | string>("start_server").then(async (payload) => {
+            const code = () => {
+                try {
+                    let _url = payload?.uri ? new URL(payload.uri) : { searchParams: null };
+                    if (_url?.searchParams?.get('code')) {
+                        return payload?.uri;
+                    } else {
                         return undefined
                     }
-                };
-                if (code()) {
-                    actions.submitProviderResult(code()).then(async () => {
-                        await appWindow.show();
-                        toast.dismiss()
-                        toast.success(`Welcome ${user?.email}!`,
-                            {
-                                duration: 1000,
-                                position: "bottom-center",
-                                style: {
-                                    borderRadius: '10px',
-                                    background: '#333',
-                                    color: '#fff',
-                                    padding: '4px 5px',
-                                    fontSize: '10px',
-                                },
-                            }
-                        );
-                    }).catch((error) => {
-                        // console.log({ error });
-                        toast.dismiss()
-                        toast.error(`Rejected authentication, try again!`,
-                            {
-                                duration: 1000,
-                                position: "bottom-center",
-                                style: {
-                                    borderRadius: '10px',
-                                    background: '#333',
-                                    color: '#fff',
-                                    padding: '4px 5px',
-                                    fontSize: '10px',
-                                },
-                            }
-                        );
-                    })
-                } else {
+                } catch (err) {
+                    return undefined
+                }
+            };
+            if (code()) {
+                actions.submitProviderResult(code()).then(async () => {
+                    await appWindow.show();
+                    toast.dismiss()
+                    toast.success(`Welcome back!`,
+                        {
+                            duration: 1000,
+                            position: "bottom-center",
+                            style: {
+                                borderRadius: '10px',
+                                background: '#333',
+                                color: '#fff',
+                                padding: '4px 5px',
+                                fontSize: '10px',
+                            },
+                        }
+                    );
+                }).catch((error) => {
+                    // console.log({ error });
                     toast.dismiss()
                     toast.error(`Rejected authentication, try again!`,
                         {
@@ -88,14 +66,43 @@ export function LoginSignup(props: any) {
                             },
                         }
                     );
-                }
-            });
-        })()
-        return () => {
-            if (typeof unlisten == "function") { unlisten() }
-        }
-    }, [])
+                })
+            } else {
+                toast.dismiss()
+                toast.error(`Rejected authentication, try again!`,
+                    {
+                        duration: 1000,
+                        position: "bottom-center",
+                        style: {
+                            borderRadius: '10px',
+                            background: '#333',
+                            color: '#fff',
+                            padding: '4px 5px',
+                            fontSize: '10px',
+                        },
+                    }
+                );
+            }
+        }).catch((err)=>{
+            console.log({err});
+            toast.dismiss()
+                toast.error(`Rejected authentication, try again!`,
+                    {
+                        duration: 1000,
+                        position: "bottom-center",
+                        style: {
+                            borderRadius: '10px',
+                            background: '#333',
+                            color: '#fff',
+                            padding: '4px 5px',
+                            fontSize: '10px',
+                        },
+                    }
+                );
+        });
+    }
     const loginwithgithub = async () => {
+        await startlistner();
         toast.loading(`Auth0 using github!`,
             {
                 duration: Infinity,
@@ -145,7 +152,7 @@ export function LoginSignup(props: any) {
 
         const submit = () => {
             if (logindata.username.value && logindata.password.value) {
-                if (logindata.username.isvalid && logindata.password.isvalid) {
+                // if (logindata.username.isvalid && logindata.password.isvalid) {
                     let loading_d = toast.loading(`Login using credentials!`,
                         {
                             duration: Infinity,
@@ -193,22 +200,22 @@ export function LoginSignup(props: any) {
                             }
                         );
                     })
-                } else {
-                    toast.dismiss('bad_credentials')
-                    toast.error(`Please check <${!logindata.username.isvalid && 'username'},${!logindata.username.isvalid && 'password'} >!`,
-                        {
-                            id: 'bad_credentials',
-                            duration: 700,
-                            style: {
-                                borderRadius: '10px',
-                                background: '#333',
-                                color: '#fff',
-                                padding: '4px 5px',
-                                fontSize: '10px',
-                            },
-                        }
-                    );
-                }
+                // } else {
+                //     toast.dismiss('bad_credentials')
+                //     toast.error(`Please check <${!logindata.username.isvalid && 'username'},${!logindata.username.isvalid && 'password'} >!`,
+                //         {
+                //             id: 'bad_credentials',
+                //             duration: 700,
+                //             style: {
+                //                 borderRadius: '10px',
+                //                 background: '#333',
+                //                 color: '#fff',
+                //                 padding: '4px 5px',
+                //                 fontSize: '10px',
+                //             },
+                //         }
+                //     );
+                // }
             } else {
                 toast.dismiss('bad_credentials')
                 toast.error(`Please fill <${!logindata.username.value && 'username'},${!logindata.username.value && 'password'} >!`,

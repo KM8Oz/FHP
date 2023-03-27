@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { PuffLoader } from "react-spinners";
-import { RootComponent, Home } from "./pages";
+import { RootComponent, Home, ActivatePeer } from "./pages";
 import styled from "styled-components";
 import { useClientContext } from "pocketbase-react";
 
@@ -24,6 +24,13 @@ function App() {
           index: true,
           path: "/",
           element: <Home />,
+          // loader: async ({ params }) => {
+          //   return [];
+          // },
+        },
+        {
+          path: "/activate",
+          element: <ActivatePeer />,
           // loader: async ({ params }) => {
           //   return [];
           // },

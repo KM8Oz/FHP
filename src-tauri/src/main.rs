@@ -2,49 +2,30 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::{Manager, PhysicalPosition, SystemTrayEvent, Window};
 use tauri::{PhysicalSize, SystemTray};
-use tauri_plugin_oauth::{start_with_config, OauthConfig};
 mod mylib;
-mod getuidwin;
+use window_shadows::set_shadow;
+
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String>{
+async fn user_processes(_window: Window) -> Result<Vec<mylib::ItemJson>, String> {
     mylib::user_processes()
 }
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+
 #[derive(Clone, serde::Serialize)]
 struct Payload {
-  uri: String,
+    uri: String,
 }
 #[tauri::command]
-async fn start_server(window: Window) -> Result<u16, String>{
-    // start(move |url| {
-    //     println!("Redirect_uri server ({}) already started✅",url);
-    //     // Because of the unprotected localhost port, you must verify the URL here.
-    //     // Preferebly send back only the token, or nothing at all if you can handle everything else in Rust.
-    //     let _ = window.emit("redirect_uri", url);
-    // })
-    // .map_err(|err| {
-    //     println!("Redirect_uri server err : ({})",err.to_string());
-    //     err.to_string()
-    // })
-    // let app = App::new(
-    //     _app.app_handle().package_info().version.build.to_string(),
-    //     _app.app_handle().package_info().package_name(),
-    //     "FHP".into(),
-    //     "FHP".into(),
-    //     None,
-    // );
-    // let _ = thisinstall(&app, &vec!["fhp://*".into()]);
-    let serverconfig = OauthConfig {
-        ports: Some(vec![62235 as u16]),
-        ..OauthConfig::default()
-    };
-    start_with_config(serverconfig, move |uri| {
-        window.emit_all("event-uri", Payload { uri }).unwrap();
-    }).map_err(|err| err.to_string())
+async fn start_server() -> Result<Payload, String> {
+    let request_uri = mylib::start_server(62235 as u16).await;
+    match request_uri {
+        Ok(url) => {
+            let _uri = format!("http://localhost:62235{}", url);
+            Ok(Payload { uri: _uri })
+        }
+        Err(_err) => Err(_err.to_string()),
+    }
 }
 
 fn main() {
@@ -63,7 +44,8 @@ fn main() {
                     width: 600 * monitorsize.width / 3360,
                     height: 900 * monitorsize.height / 2100,
                 });
-                let _ = _main_window.set_position(PhysicalPosition { x: -1000, y: -1000 });
+                set_shadow(&_main_window, true).expect("Unsupported platform!");;
+                // let _ = _main_window.set_position(PhysicalPosition { x: -1000, y: -1000 });
             }
             // let _ = start_server(app.get_window("main").unwrap());
             Ok(())
@@ -95,7 +77,7 @@ fn main() {
                             PhysicalPosition {
                                 x: ((position.x as u32) - (600 * monitorsize.width / 3360) / 2)
                                     + 32,
-                                y: ((position.y as u32) + (900 * monitorsize.height / 2100)),
+                                y: (position.y as u32 - 600),
                             }
                         } else {
                             PhysicalPosition {
@@ -120,6 +102,7 @@ fn main() {
                         }
                     };
                     let _ = main_window.set_position(winposition);
+                    let _ = main_window.set_always_on_top(true);
                     match main_window.is_visible() {
                         Ok(status) => {
                             if status {
@@ -140,7 +123,10 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet, start_server, user_processes])
+        .invoke_handler(tauri::generate_handler![
+            start_server,
+            user_processes
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
